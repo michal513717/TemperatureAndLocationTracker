@@ -10,7 +10,8 @@ class DatabaseManager extends Manager {
   private collections!: Collections;
 
   public static COLLECTION_NAMES: Record<string, keyof Collections> = {
-    TEMPERATURE_AND_LOCATION_COLLECTION: "TEMPERATURE_AND_LOCATION_COLLECTION"
+    TEMPERATURE_AND_LOCATION_COLLECTION: "TEMPERATURE_AND_LOCATION_COLLECTION",
+    USERS_COLLECTION: "USERS_COLLECTION"
   };
 
   constructor() {
@@ -23,7 +24,8 @@ class DatabaseManager extends Manager {
   private async init(): Promise<void> {
 
     this.collections = {
-      TEMPERATURE_AND_LOCATION_COLLECTION: await this.getCollection("TEMPERATURE_AND_LOCATION_COLLECTION")
+      TEMPERATURE_AND_LOCATION_COLLECTION: await this.getCollection("TEMPERATURE_AND_LOCATION_COLLECTION"),
+      USERS_COLLECTION: await this.getCollection("USERS_COLLECTION")
     };
   };
 
@@ -65,6 +67,25 @@ class DatabaseManager extends Manager {
       console.log(error);
     }
   };
+
+  public async getRecordById<T extends object>(
+    collectionName: keyof Collections,
+    recordID: string,
+    recordValue: RecordValue
+  ): Promise<T | null> {
+    try {
+      const record = await this.collections[collectionName]
+        .where(recordID, "==", recordValue)
+        .limit(1)
+        .withConverter(FirebaseHelper.converterAssignTypes<T>())
+        .get();
+
+      return record.docs[0] !== undefined ? record.docs[0].data() : null;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }
 
-export const instance = new DatabaseManager();
+export const databaseManager = new DatabaseManager();
