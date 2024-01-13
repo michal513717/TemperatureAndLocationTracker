@@ -2,6 +2,10 @@ import { getFirestore } from "firebase-admin/firestore";
 import { Manager } from "../common/common.manager.config";
 import { Collections, RecordValue } from "../models/database.models";
 import { FirebaseHelper } from "../utils/firebase/FirebaseHelper";
+import initFireBaseApp from "../database/firebase";
+import { getLogger } from "log4js";
+
+const logger = getLogger();
 
 export class DatabaseManager {
 
@@ -15,7 +19,12 @@ export class DatabaseManager {
     };
 
     public static getInstance(): DatabaseManager {
+
+        
         if (!DatabaseManager.instance) {
+            
+            initFireBaseApp();
+
             DatabaseManager.instance = new DatabaseManager();
         }
 
@@ -58,7 +67,7 @@ export class DatabaseManager {
 
             return parsedData;
         } catch (error) {
-            console.log(error);
+            logger.error(error);
             return [];
         }
     };
@@ -70,7 +79,7 @@ export class DatabaseManager {
         try {
             await this.collections[collectionName].add(data);
         } catch (error) {
-            console.log(error);
+            logger.error(error);
         }
     };
 
@@ -88,7 +97,7 @@ export class DatabaseManager {
 
             return record.docs[0] !== undefined ? record.docs[0].data() : null;
         } catch (error) {
-            console.log(error);
+            logger.error(error);
             return null;
         }
     }

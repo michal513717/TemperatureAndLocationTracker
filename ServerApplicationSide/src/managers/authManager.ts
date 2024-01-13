@@ -1,6 +1,11 @@
+import { Timestamp } from "firebase-admin/firestore";
 import { Manager } from "../common/common.manager.config";
+import { LoginCredentials, UserCredentials } from "../models/auth.models";
 import { UsersDatabaseType } from "../models/database.models";
+import { UserExistError, WrongPasswordError } from "../utils/errors/errors";
+import { AuthHelper } from "../utils/helpers/AuthHelper";
 import { DatabaseManager } from "./databaseManager";
+import { FirebaseHelper } from "../utils/firebase/FirebaseHelper";
 
 //TODO implement
 export class AuthManager {
@@ -9,7 +14,7 @@ export class AuthManager {
     private databaseManager!: DatabaseManager;
     static databaseManager: DatabaseManager;
 
-    constructor(){
+    constructor() {
 
         this.init();
     }
@@ -40,5 +45,43 @@ export class AuthManager {
         }
 
         return user;
+    }
+
+    public async isUserExist(userName: string): Promise<boolean> {
+        try {
+            await this.getUser(userName);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    public async addUser({ userName, password }: UserCredentials): Promise<void> {
+
+        if (await this.isUserExist(userName)) {
+            throw new UserExistError();
+        }
+
+        const payload = {
+            userName: userName,
+            password: password,
+            accountType: "USER",
+            createdAt: FirebaseHelper.getServerTimeStamp()
+        }
+
+        this.databaseManager.addRecord("USERS_COLLECTION", payload);
+    }
+
+    public async login({ userName, password }: LoginCredentials): Promise<{ token: string }> {
+
+        const user = await this.getUser(userName);
+
+        if (user.password !== password) {
+            throw new WrongPasswordError();
+        }
+
+        const token = AuthHelper.generateToken(user);
+
+        return token;
     }
 };

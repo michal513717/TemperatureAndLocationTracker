@@ -11,6 +11,6 @@ export type AuthRequest<
 };
 
 export type TokenPayload = {
-  userID: string;
+  userName: string;
   accountType: AccountType;
 };

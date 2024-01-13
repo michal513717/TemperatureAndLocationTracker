@@ -2,7 +2,6 @@ import cors from "cors";
 import express, { Application } from "express";
 import * as http from "http";
 import { debugRequest } from "./utils/debugRequest";
-import initFireBaseApp from "./database/firebase";
 import { APPLICATION_CONFIG } from "./configs";
 import { CommonRoutesConfig } from "./common/common.routes.config";
 import { BasicRoute } from "./routes/basic.routes";
@@ -11,6 +10,7 @@ import { NotValidRoutes } from "./routes/notValid.routes";
 import { AuthRoutes } from "./routes/auth.routes";
 import { AuthManager } from "./managers/authManager";
 import { DatabaseManager } from "./managers/databaseManager";
+import { Logger, getLogger } from "log4js";
 
 export class MainApp {
 
@@ -20,6 +20,7 @@ export class MainApp {
     private server!: http.Server;
     private config!: typeof APPLICATION_CONFIG;
     private routes!: Array<CommonRoutesConfig>;
+    private logger!: Logger;
 
     constructor() {
 
@@ -28,25 +29,25 @@ export class MainApp {
 
     private init(): void {
 
-        this.initFireBase();
+        this.initLogger();
         this.initApplcationConfig();
         this.initApplicationAndServer();
         this.initBasicDebug();
         this.initRoutes();
         this.initInstacesOfManagers();
-
+    
         this.startSever();
+    }
+
+    private initLogger(): void {
+
+        this.logger = getLogger();
     }
 
     private initInstacesOfManagers(): void {
 
         this.databaseManager = DatabaseManager.getInstance();
         this.authManager = AuthManager.getInstance();
-    }
-
-    private initFireBase(): void {
-
-        initFireBaseApp();
     }
 
     private initApplicationAndServer(): void {
@@ -89,12 +90,12 @@ export class MainApp {
 
         this.server.listen(port, () => {
             this.routes.forEach((route) => {
-                console.log(
+                this.logger.info(
                     `Routes configured for ${route.getVersion()} - ${route.getName()}`
                 );
             });
 
-            console.log(runningMessage);
+            this.logger.info(runningMessage);
         });
     }
 }

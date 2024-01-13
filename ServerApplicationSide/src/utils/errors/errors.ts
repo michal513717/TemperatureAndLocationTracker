@@ -11,3 +11,15 @@ export class TokenExpiredError extends ErrorWithCode {
         super("Token Expired", 403, "TOKEN_EXPIRED");
     }
 }
+
+export class WrongPasswordError extends ErrorWithCode {
+    constructor(){
+        super("Wrong password", 403, "WRONG_PASSWORD");
+    }
+}
+
+export class UserExistError extends ErrorWithCode {
+    constructor(){
+        super("User name already exist", 403, "USER_EXIST");
+    }
+}

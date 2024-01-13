@@ -1,3 +1,4 @@
+import firebase from "firebase-admin";
 
 export class FirebaseHelper {
   public static converterAssignTypes<T extends {}>() {
@@ -10,4 +11,8 @@ export class FirebaseHelper {
       }
     };
   };
+
+  public static getServerTimeStamp(){
+    return firebase.firestore.FieldValue.serverTimestamp();
+  }
 }
