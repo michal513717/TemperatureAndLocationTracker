@@ -1,3 +1,5 @@
+require('dotenv').config(); 
+
 export const APPLICATION_CONFIG = {
     DEBUG_REQUEST: true, // Show infomation about incoming request
     PORT: 8080, // Server run at this port

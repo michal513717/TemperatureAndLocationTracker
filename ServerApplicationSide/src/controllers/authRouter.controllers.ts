@@ -8,7 +8,6 @@ import { validationErrorResponse } from "../utils/errors/validationErrorResponse
 import { ErrorWithCode } from "../common/common.error.config";
 import { internalServerErrorResponse } from "../utils/errors/internalServerError";
 
-
 const logger = getLogger();
 
 export const loginController = async (req: Request, res: Response) => {

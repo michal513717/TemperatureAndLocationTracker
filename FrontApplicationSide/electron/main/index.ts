@@ -53,6 +53,8 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    minHeight: 700,
+    minWidth: 800
   })
 
   if (url) { // electron-vite-vue#298
