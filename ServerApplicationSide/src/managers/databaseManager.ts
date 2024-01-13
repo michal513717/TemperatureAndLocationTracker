@@ -7,29 +7,21 @@ import { getLogger } from "log4js";
 
 const logger = getLogger();
 
-export class DatabaseManager {
+class DatabaseManager {
 
     private db!: FirebaseFirestore.Firestore;
     private collections!: Collections;
-    protected static instance: DatabaseManager;
 
     constructor() {
 
+        this.initFirebaseApp();
         this.init();
     };
 
-    public static getInstance(): DatabaseManager {
+    private initFirebaseApp(): void {
 
-        
-        if (!DatabaseManager.instance) {
-            
-            initFireBaseApp();
-
-            DatabaseManager.instance = new DatabaseManager();
-        }
-
-        return DatabaseManager.instance;
-    };
+        initFireBaseApp();
+    }
 
     private async init(): Promise<void> {
 
@@ -102,3 +94,7 @@ export class DatabaseManager {
         }
     }
 }
+
+var instance = new DatabaseManager();
+
+export default instance;

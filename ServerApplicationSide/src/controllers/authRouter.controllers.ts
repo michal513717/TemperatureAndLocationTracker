@@ -8,7 +8,6 @@ import { validationErrorResponse } from "../utils/errors/validationErrorResponse
 import { ErrorWithCode } from "../common/common.error.config";
 import { internalServerErrorResponse } from "../utils/errors/internalServerError";
 
-const authManager = AuthManager.getInstance();
 
 const logger = getLogger();
 
@@ -16,7 +15,7 @@ export const loginController = async (req: Request, res: Response) => {
   try {
     const credentials = await loginUserSchema.parseAsync(req.body);
 
-    const result = await authManager.login(credentials);
+    const result = await AuthManager.login(credentials);
 
     return res.status(200).json({
         status: CommonRoutesConfig.statusMessage.SUCCESS,
@@ -42,7 +41,7 @@ export const registerController = async (req: Request, res: Response) => {
   try {
     const credentials = await registerUserSchema.parseAsync(req.body);
 
-    await authManager.addUser(credentials);
+    await AuthManager.addUser(credentials);
 
     return res.status(200).json({
         status: CommonRoutesConfig.statusMessage.SUCCESS,

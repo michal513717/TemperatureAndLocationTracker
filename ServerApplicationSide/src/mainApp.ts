@@ -8,19 +8,15 @@ import { BasicRoute } from "./routes/basic.routes";
 import { DatabaseRoutes } from "./routes/database.routes";
 import { NotValidRoutes } from "./routes/notValid.routes";
 import { AuthRoutes } from "./routes/auth.routes";
-import { AuthManager } from "./managers/authManager";
-import { DatabaseManager } from "./managers/databaseManager";
-import { Logger, getLogger } from "log4js";
+import * as log4js from "log4js";
 
 export class MainApp {
 
-    private databaseManager!: DatabaseManager;
-    private authManager!: AuthManager;
     private application!: Application;
     private server!: http.Server;
     private config!: typeof APPLICATION_CONFIG;
     private routes!: Array<CommonRoutesConfig>;
-    private logger!: Logger;
+    private logger!: any;
 
     constructor() {
 
@@ -34,20 +30,23 @@ export class MainApp {
         this.initApplicationAndServer();
         this.initBasicDebug();
         this.initRoutes();
-        this.initInstacesOfManagers();
     
         this.startSever();
     }
 
     private initLogger(): void {
 
-        this.logger = getLogger();
-    }
+        log4js.configure({
+            appenders: {
+                out: { type: "stdout" },
+                app: { type: "file", filename: "application.log" },
+            },
+            categories: {
+                default: { appenders: ["out", "app"], level: "debug" },
+            },
+        });
 
-    private initInstacesOfManagers(): void {
-
-        this.databaseManager = DatabaseManager.getInstance();
-        this.authManager = AuthManager.getInstance();
+        this.logger = log4js.getLogger("Main App");
     }
 
     private initApplicationAndServer(): void {

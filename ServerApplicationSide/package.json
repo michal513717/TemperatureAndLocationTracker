@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "ts-node-dev ./index.ts",
+    "debug": "node -r ts-node/register index.ts",
     "build": "turbo build"
   },
   "dependencies": {

@@ -10,8 +10,6 @@ import { InvalidTokenError } from "../utils/errors/errors";
 
 const logger = log4js.getLogger();
 
-const authManager = AuthManager.getInstance();
-
 export const verifyArduinoClient = async (
     req: Request,
     res: Response,
@@ -37,7 +35,7 @@ export const verifyUserMiddleware = async (
         }
 
         const decodeToken = AuthHelper.getDataFromToken(token);
-        const user = await authManager.getUser(decodeToken.userID);
+        const user = await AuthManager.getUser(decodeToken.userName);
 
         if(user.accountType !== decodeToken.accountType){
             logger.warn("Invalid Token Error");

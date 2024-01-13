@@ -4,41 +4,15 @@ import { LoginCredentials, UserCredentials } from "../models/auth.models";
 import { UsersDatabaseType } from "../models/database.models";
 import { UserExistError, WrongPasswordError } from "../utils/errors/errors";
 import { AuthHelper } from "../utils/helpers/AuthHelper";
-import { DatabaseManager } from "./databaseManager";
+import databaseManager from "./databaseManager";
 import { FirebaseHelper } from "../utils/firebase/FirebaseHelper";
 
-//TODO implement
 export class AuthManager {
 
     protected static instance: AuthManager;
-    private databaseManager!: DatabaseManager;
-    static databaseManager: DatabaseManager;
 
-    constructor() {
-
-        this.init();
-    }
-
-    private init(): void {
-
-        this.setupManagers();
-    }
-
-    private setupManagers(): void {
-
-        this.databaseManager = DatabaseManager.getInstance();
-    }
-
-    public static getInstance(): AuthManager {
-        if (!AuthManager.instance) {
-            AuthManager.instance = new AuthManager();
-        }
-
-        return AuthManager.instance;
-    };
-
-    public async getUser(userName: string) {
-        const user = await this.databaseManager.getRecordById<UsersDatabaseType>("USERS_COLLECTION", "userName", userName);
+    public static async getUser(userName: string) {
+        const user = await databaseManager.getRecordById<UsersDatabaseType>("USERS_COLLECTION", "userName", userName);
 
         if (user === null) {
             throw new Error("User Not Found");
@@ -47,18 +21,18 @@ export class AuthManager {
         return user;
     }
 
-    public async isUserExist(userName: string): Promise<boolean> {
+    public static async isUserExist(userName: string): Promise<boolean> {
         try {
-            await this.getUser(userName);
+            await AuthManager.getUser(userName);
             return true;
         } catch (error) {
             return false;
         }
     }
 
-    public async addUser({ userName, password }: UserCredentials): Promise<void> {
+    public static async addUser({ userName, password }: UserCredentials): Promise<void> {
 
-        if (await this.isUserExist(userName)) {
+        if (await AuthManager.isUserExist(userName)) {
             throw new UserExistError();
         }
 
@@ -69,12 +43,12 @@ export class AuthManager {
             createdAt: FirebaseHelper.getServerTimeStamp()
         }
 
-        this.databaseManager.addRecord("USERS_COLLECTION", payload);
+        databaseManager.addRecord("USERS_COLLECTION", payload);
     }
 
-    public async login({ userName, password }: LoginCredentials): Promise<{ token: string }> {
+    public static async login({ userName, password }: LoginCredentials): Promise<{ token: string }> {
 
-        const user = await this.getUser(userName);
+        const user = await AuthManager.getUser(userName);
 
         if (user.password !== password) {
             throw new WrongPasswordError();
