@@ -1,4 +1,4 @@
-import { NextFunction } from "express"
+import type { Request, Response } from "express"
 
 
 //TODO implement

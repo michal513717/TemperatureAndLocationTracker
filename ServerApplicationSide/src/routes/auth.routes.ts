@@ -6,7 +6,7 @@ import { loginController, registerController } from "../controllers/authRouter.c
 export class AuthRoutes extends CommonRoutesConfig {
 
   constructor(app: Application) {
-    super(app, "AuthRoutes", "v0.0.1");
+    super(app, "AuthRoutes", "0.0.1");
   }
 
   configureRoute(): Application {
