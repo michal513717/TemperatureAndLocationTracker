@@ -3,12 +3,12 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <HTTPClient.h>
-#include <ArduinoJson.h> 
+#include <ArduinoJson.h>
 
 const char *ssid = "your-ssid";
 const char *password = "your-password";
 
-const int dthpin = 17;
+const int dthpin = 4;
 const int dthtype = DHT11;
 
 DHT dht(dthpin, dthtype);
@@ -42,9 +42,9 @@ float readHumidity() {
   return h;
 }
 
-String getWiFiLocation() {
+JsonObject getWiFiLocation() {
   String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=YOUR_GOOGLE_API_KEY";
-  
+
   HTTPClient http;
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
@@ -52,20 +52,21 @@ String getWiFiLocation() {
   String payload = "{}";
   int httpResponseCode = http.POST(payload);
 
-  String location = "";
+  JsonObject locationObj;
   if (httpResponseCode == 200) {
     DynamicJsonDocument jsonDoc(1024);
     DeserializationError error = deserializeJson(jsonDoc, http.getString());
-    
+
     if (!error) {
       float lat = jsonDoc["location"]["lat"];
       float lon = jsonDoc["location"]["lng"];
-      location = "Latitude: " + String(lat, 6) + ", Longitude: " + String(lon, 6);
+      locationObj["Latitude"] = lat;
+      locationObj["Longitude"] = lon;
     }
   }
 
   http.end();
-  return location;
+  return locationObj;
 }
 
 void setup() {
@@ -75,7 +76,7 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print("WiFi not connected");
+    Serial.print(".");
   }
   Serial.println("");
   Serial.println("WiFi connected");
@@ -83,22 +84,27 @@ void setup() {
   Serial.print("Ready, go to: http://");
   Serial.print(WiFi.localIP());
 
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/plain", String(readTemperature()).c_str());
-  });
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
 
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/plain", String(readHumidity()).c_str());
-  });
+    float temperature = readTemperature();
+    float humidity = readHumidity();
+    JsonObject locationObj = getWiFiLocation();
 
-  server.on("/location", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String location = getWiFiLocation();
-    request->send_P(200, "text/plain", location.c_str());
+    // Utwórz główny obiekt JSON
+    DynamicJsonDocument jsonDoc(256);
+    jsonDoc["Temperature"] = temperature;
+    jsonDoc["Humidity"] = humidity;
+    jsonDoc["Localization"] = locationObj;
+    
+    String jsonResponse;
+    serializeJson(jsonDoc, jsonResponse);
+
+    request->send(200, "application/json", jsonResponse);
   });
 
   server.begin();
 }
 
 void loop() {
-
+  // Do any background tasks if needed
 }
