@@ -44,7 +44,7 @@ float readHumidity() {
   return h;
 }
 
-JsonObject getWiFiLocation() {
+JsonDocument getWiFiLocation() {
   String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + String(googleApiKey);
 
   HTTPClient http;
@@ -54,7 +54,7 @@ JsonObject getWiFiLocation() {
   String payload = "{}";
   int httpResponseCode = http.POST(payload);
 
-  JsonObject locationObj;
+  JsonDocument locationObj;
   if (httpResponseCode == 200) {
     DynamicJsonDocument jsonDoc(1024);
     DeserializationError error = deserializeJson(jsonDoc, http.getString());
@@ -90,7 +90,7 @@ void setup() {
 
     float temperature = readTemperature();
     float humidity = readHumidity();
-    JsonObject locationObj = getWiFiLocation();
+    JsonDocument locationObj = getWiFiLocation();
 
     // Utwórz główny obiekt JSON
     DynamicJsonDocument jsonDoc(256);
