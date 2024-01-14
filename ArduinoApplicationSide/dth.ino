@@ -2,7 +2,8 @@
 #include "ESPAsyncWebServer.h"
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <stdbool.h>
+#include <HTTPClient.h>  // Dodane dla obsługi HTTP
+#include <ArduinoJson.h> // Dodane dla obsługi JSON
 
 const char *ssid = "your-ssid";
 const char *password = "your-password";
@@ -41,6 +42,32 @@ float readHumidity() {
   return h;
 }
 
+String getWiFiLocation() {
+  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=YOUR_GOOGLE_API_KEY";
+  
+  HTTPClient http;
+  http.begin(url);
+  http.addHeader("Content-Type", "application/json");
+
+  String payload = "{}";
+  int httpResponseCode = http.POST(payload);
+
+  String location = "";
+  if (httpResponseCode == 200) {
+    DynamicJsonDocument jsonDoc(1024);
+    DeserializationError error = deserializeJson(jsonDoc, http.getString());
+    
+    if (!error) {
+      float lat = jsonDoc["location"]["lat"];
+      float lon = jsonDoc["location"]["lng"];
+      location = "Latitude: " + String(lat, 6) + ", Longitude: " + String(lon, 6);
+    }
+  }
+
+  http.end();
+  return location;
+}
+
 void setup() {
   Serial.begin(115200);
   dht.begin();
@@ -64,8 +91,14 @@ void setup() {
     request->send_P(200, "text/plain", String(readHumidity()).c_str());
   });
 
+  server.on("/location", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String location = getWiFiLocation();
+    request->send_P(200, "text/plain", location.c_str());
+  });
+
   server.begin();
 }
 
 void loop() {
+  // Do any background tasks if needed
 }
