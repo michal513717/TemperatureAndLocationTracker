@@ -2,8 +2,8 @@
 #include "ESPAsyncWebServer.h"
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <HTTPClient.h> 
-#include <ArduinoJson.h> 
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 const char *ssid = "your-ssid";
 const char *password = "your-password";
@@ -43,7 +43,7 @@ float readHumidity() {
 }
 
 String getWiFiLocation() {
-  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDHaR0-dajgW7AJmjDV0VHPAX-PW52EMOU";
+  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=YOUR_GOOGLE_API_KEY";
   
   HTTPClient http;
   http.begin(url);
@@ -83,17 +83,24 @@ void setup() {
   Serial.print("Ready, go to: http://");
   Serial.print(WiFi.localIP());
 
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/plain", String(readTemperature()).c_str());
-  });
-
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/plain", String(readHumidity()).c_str());
-  });
-
-  server.on("/location", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // Odczytaj wartości zmiennych
+    float temperature = readTemperature();
+    float humidity = readHumidity();
     String location = getWiFiLocation();
-    request->send_P(200, "text/plain", location.c_str());
+
+    // Utwórz obiekt JSON
+    DynamicJsonDocument jsonDoc(256);
+    jsonDoc["Temperature"] = temperature;
+    jsonDoc["Humidity"] = humidity;
+    jsonDoc["Localization"] = location;
+
+    // Serializuj obiekt JSON do ciągu znaków
+    String jsonResponse;
+    serializeJson(jsonDoc, jsonResponse);
+
+    // Wyślij odpowiedź JSON
+    request->send(200, "application/json", jsonResponse);
   });
 
   server.begin();
