@@ -2,11 +2,12 @@
 #include "ESPAsyncWebServer.h"
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
+#include <ArduinoJson.h>
 
 const char *ssid = "your-ssid";
 const char *password = "your-password";
 
-const int dthpin = 4;
+const int dthpin = 17;
 const int dthtype = DHT11;
 
 DHT dht(dthpin, dthtype);
@@ -20,7 +21,7 @@ String getWiFiLocation() {
   int numNetworks = WiFi.scanNetworks();
 
   if (numNetworks > 0) {
-    // Sortowanie sieci według sygnału
+    // sortowanie sieci według sygnału
     int indices[numNetworks];
     for (int i = 0; i < numNetworks; i++) {
       indices[i] = i;
@@ -97,7 +98,6 @@ void setup() {
     jsonDoc["Humidity"] = humidity;
     jsonDoc["Localization"] = location;
 
-    // Serializuj obiekt JSON do ciągu znaków
     String jsonResponse;
     serializeJson(jsonDoc, jsonResponse);
 
