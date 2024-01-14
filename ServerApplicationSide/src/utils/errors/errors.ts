@@ -23,3 +23,9 @@ export class UserExistError extends ErrorWithCode {
         super("User name already exist", 403, "USER_EXIST");
     }
 }
+
+export class UserNotFound extends ErrorWithCode {
+    constructor(){
+        super("User doesnt exist", 403, "USER_NOT_EXIST");
+    }
+}

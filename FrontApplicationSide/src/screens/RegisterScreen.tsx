@@ -12,17 +12,34 @@ import {
     useToast,
     Link as ChakraLink
 } from '@chakra-ui/react';
+import { redirect } from "react-router-dom";
 import { Link as ReactRouterLink } from 'react-router-dom'
 import axios from "axios";
+
+
+// TODO REFACTOR. ITS VERY BAD CODE
+
 
 function LoginScreen() {
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [repeatPassword, setRepeatPassword] = useState<string>('');
     const { toggleColorMode } = useColorMode();
     const toast = useToast();
     const formBackground = useColorModeValue('gray.100', 'gray.700');
 
     const handleLogin =  useCallback(async() => {
+
+        if(password !== repeatPassword){
+            toast({
+                title: 'Invalid Data',
+                description: "Password are not equal",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            })
+            return
+        }
 
         if(userName === "" || password === ""){
             toast({
@@ -36,16 +53,39 @@ function LoginScreen() {
         }
 
         try {
-            const req = await axios.post("http://192.168.0.170:8080/auth/login", { userName, password });
+            const req = await axios.post("http://192.168.0.170:8080/auth/register", { userName, password });
 
             console.log(req.status);
     
-        } catch (error) {
+            if(req.status === 200){
+                toast({
+                    title: 'Success!',
+                    description: "User account create success",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                })
+
+                redirect("/");
+            }
+
+        } catch (error: any) {
             
-            console.log(error);
+            let messeage = {
+                "VALIDATION_ERROR": "User name must contain min 5 chars and password 8",
+                "USER_EXIST": "User name have been already taken"
+            }
+
+            toast({
+                title: "Server error.",
+                //@ts-ignore
+                description: messeage[error?.response?.data?.code],
+                status: "error",
+                duration: 3000
+            })
         }
 
-    },[userName, password]);
+    },[userName, password, repeatPassword]);
 
 
     return (
@@ -57,7 +97,7 @@ function LoginScreen() {
                 borderRadius={8}
                 boxShadow="lg"
             >
-                <Heading mb={6}>Log In</Heading>
+                <Heading mb={6}>Register now!</Heading>
                 <Input
                     placeholder="johndoe@gmail.com"
                     type="email"
@@ -72,6 +112,14 @@ function LoginScreen() {
                     variant="filled"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    mb={3}
+                />
+                <Input
+                    placeholder="**********"
+                    type="password"
+                    variant="filled"
+                    value={repeatPassword}
+                    onChange={(e) => setRepeatPassword(e.target.value)}
                     mb={6}
                 />
                 <Button colorScheme="teal" mb={8} onClick={handleLogin}>
@@ -79,7 +127,7 @@ function LoginScreen() {
                 </Button>
                 <FormControl display="flex" alignItems="center">
                     <FormLabel htmlFor="dark_mode" mb="4">
-                        Don't have account? <ChakraLink as={ReactRouterLink} to={'/register'}> Register now! </ChakraLink>
+                        Have a account? <ChakraLink as={ReactRouterLink} to={'/'}> Login now! </ChakraLink>
                     </FormLabel>
                 </FormControl>
                 <FormControl display="flex" alignItems="center">

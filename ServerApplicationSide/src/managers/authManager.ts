@@ -2,7 +2,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import { Manager } from "../common/common.manager.config";
 import { LoginCredentials, UserCredentials } from "../models/auth.models";
 import { UsersDatabaseType } from "../models/database.models";
-import { UserExistError, WrongPasswordError } from "../utils/errors/errors";
+import { UserExistError, UserNotFound, WrongPasswordError } from "../utils/errors/errors";
 import { AuthHelper } from "../utils/helpers/AuthHelper";
 import databaseManager from "./databaseManager";
 import { FirebaseHelper } from "../utils/firebase/FirebaseHelper";
@@ -15,7 +15,7 @@ export class AuthManager {
         const user = await databaseManager.getRecordById<UsersDatabaseType>("USERS_COLLECTION", "userName", userName);
 
         if (user === null) {
-            throw new Error("User Not Found");
+            throw new UserNotFound();
         }
 
         return user;
