@@ -43,7 +43,7 @@ float readHumidity() {
 }
 
 String getWiFiLocation() {
-  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=YOUR_GOOGLE_API_KEY";
+  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDHaR0-dajgW7AJmjDV0VHPAX-PW52EMOU";
   
   HTTPClient http;
   http.begin(url);
