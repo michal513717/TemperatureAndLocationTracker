@@ -4,9 +4,11 @@
 #include <DHT.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include "conf.h"
 
-const char *ssid = "your-ssid";
-const char *password = "your-password";
+const char *ssid = SSID;
+const char *password = PASSWORD;
+const char *googleApiKey = GOOGLE_API_KEY;
 
 const int dthpin = 4;
 const int dthtype = DHT11;
@@ -43,7 +45,7 @@ float readHumidity() {
 }
 
 JsonObject getWiFiLocation() {
-  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=YOUR_GOOGLE_API_KEY";
+  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=" + String(googleApiKey);
 
   HTTPClient http;
   http.begin(url);
@@ -76,7 +78,7 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Serial.print("WiFi not connected");
   }
   Serial.println("");
   Serial.println("WiFi connected");
