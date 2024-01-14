@@ -2,7 +2,8 @@
 #include "ESPAsyncWebServer.h"
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <ArduinoJson.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h> 
 
 const char *ssid = "your-ssid";
 const char *password = "your-password";
@@ -14,36 +15,6 @@ DHT dht(dthpin, dthtype);
 AsyncWebServer server(80);
 
 bool dhtReadError = false;
-
-String getWiFiLocation() {
-  String location = "";
-
-  int numNetworks = WiFi.scanNetworks();
-
-  if (numNetworks > 0) {
-    // sortowanie sieci według sygnału
-    int indices[numNetworks];
-    for (int i = 0; i < numNetworks; i++) {
-      indices[i] = i;
-    }
-
-    for (int i = 0; i < numNetworks; i++) {
-      for (int j = i + 1; j < numNetworks; j++) {
-        if (WiFi.RSSI(indices[j]) > WiFi.RSSI(indices[i])) {
-          std::swap(indices[i], indices[j]);
-        }
-      }
-    }
-    for (int i = 0; i < min(5, numNetworks); i++) {
-      String networkInfo = "SSID: " + WiFi.SSID(indices[i]) + ", RSSI: " + String(WiFi.RSSI(indices[i]));
-      location += networkInfo + "\n";
-    }
-  } else {
-    location = "No WiFi networks found.";
-  }
-
-  return location;
-}
 
 float readTemperature() {
   float t = dht.readTemperature();
@@ -71,6 +42,32 @@ float readHumidity() {
   return h;
 }
 
+String getWiFiLocation() {
+  String url = "https://www.googleapis.com/geolocation/v1/geolocate?key=YOUR_GOOGLE_API_KEY";
+  
+  HTTPClient http;
+  http.begin(url);
+  http.addHeader("Content-Type", "application/json");
+
+  String payload = "{}";
+  int httpResponseCode = http.POST(payload);
+
+  String location = "";
+  if (httpResponseCode == 200) {
+    DynamicJsonDocument jsonDoc(1024);
+    DeserializationError error = deserializeJson(jsonDoc, http.getString());
+    
+    if (!error) {
+      float lat = jsonDoc["location"]["lat"];
+      float lon = jsonDoc["location"]["lng"];
+      location = "Latitude: " + String(lat, 6) + ", Longitude: " + String(lon, 6);
+    }
+  }
+
+  http.end();
+  return location;
+}
+
 void setup() {
   Serial.begin(115200);
   dht.begin();
@@ -78,7 +75,7 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Serial.print("WiFi not connected");
   }
   Serial.println("");
   Serial.println("WiFi connected");
@@ -86,28 +83,22 @@ void setup() {
   Serial.print("Ready, go to: http://");
   Serial.print(WiFi.localIP());
 
-  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send_P(200, "text/plain", String(readTemperature()).c_str());
+  });
 
-    float temperature = readTemperature();
-    float humidity = readHumidity();
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send_P(200, "text/plain", String(readHumidity()).c_str());
+  });
+
+  server.on("/location", HTTP_GET, [](AsyncWebServerRequest *request) {
     String location = getWiFiLocation();
-
-    // Utwórz obiekt JSON
-    DynamicJsonDocument jsonDoc(256);
-    jsonDoc["Temperature"] = temperature;
-    jsonDoc["Humidity"] = humidity;
-    jsonDoc["Localization"] = location;
-
-    String jsonResponse;
-    serializeJson(jsonDoc, jsonResponse);
-
-    // Wyślij odpowiedź JSON
-    request->send(200, "application/json", jsonResponse);
+    request->send_P(200, "text/plain", location.c_str());
   });
 
   server.begin();
 }
 
 void loop() {
-  // Do any background tasks if needed
+
 }
