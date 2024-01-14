@@ -84,7 +84,7 @@ void setup() {
   Serial.print(WiFi.localIP());
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
-    // Odczytaj wartości zmiennych
+
     float temperature = readTemperature();
     float humidity = readHumidity();
     String location = getWiFiLocation();
@@ -94,12 +94,10 @@ void setup() {
     jsonDoc["Temperature"] = temperature;
     jsonDoc["Humidity"] = humidity;
     jsonDoc["Localization"] = location;
-
-    // Serializuj obiekt JSON do ciągu znaków
+    
     String jsonResponse;
     serializeJson(jsonDoc, jsonResponse);
 
-    // Wyślij odpowiedź JSON
     request->send(200, "application/json", jsonResponse);
   });
 
