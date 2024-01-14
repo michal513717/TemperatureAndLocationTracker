@@ -2,8 +2,8 @@
 #include "ESPAsyncWebServer.h"
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <HTTPClient.h>  // Dodane dla obsługi HTTP
-#include <ArduinoJson.h> // Dodane dla obsługi JSON
+#include <HTTPClient.h> 
+#include <ArduinoJson.h> 
 
 const char *ssid = "your-ssid";
 const char *password = "your-password";
