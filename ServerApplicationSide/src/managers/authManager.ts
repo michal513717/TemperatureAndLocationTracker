@@ -40,7 +40,7 @@ export class AuthManager {
             userName: userName,
             password: password,
             accountType: "USER",
-            createdAt: FirebaseHelper.getServerTimeStamp()
+            createdAt: await FirebaseHelper.getServerTimeStamp()
         }
 
         databaseManager.addRecord("USERS_COLLECTION", payload);
