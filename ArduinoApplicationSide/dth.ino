@@ -62,8 +62,8 @@ JsonDocument getWiFiLocation() {
     if (!error) {
       float lat = jsonDoc["location"]["lat"];
       float lon = jsonDoc["location"]["lng"];
-      locationObj["Latitude"] = lat;
-      locationObj["Longitude"] = lon;
+      locationObj["latitude"] = lat;
+      locationObj["longitude"] = lon;
     }
   }
 
@@ -78,7 +78,7 @@ void setup() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print("WiFi not connected");
+    Serial.println("WiFi not connected");
   }
   Serial.println("");
   Serial.println("WiFi connected");
@@ -94,9 +94,9 @@ void setup() {
 
     // Utwórz główny obiekt JSON
     DynamicJsonDocument jsonDoc(256);
-    jsonDoc["Temperature"] = temperature;
-    jsonDoc["Humidity"] = humidity;
-    jsonDoc["Localization"] = locationObj;
+    jsonDoc["temperature"] = temperature;
+    jsonDoc["humidity"] = humidity;
+    jsonDoc["localization"] = locationObj;
     
     String jsonResponse;
     serializeJson(jsonDoc, jsonResponse);

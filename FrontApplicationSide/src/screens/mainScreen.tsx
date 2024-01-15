@@ -10,7 +10,6 @@ import { Point } from '@/models/points.models';
 import { APPLICATION_CONFIG } from '@/configs';
 
 function mainScreen() {
-
   const defaultProps = {
     center: {
       lat: 33.99835602,
@@ -60,7 +59,7 @@ function mainScreen() {
         apiKey={APPLICATION_CONFIG.API_KEY}
         defaultCenter={{ lat: 45.4046987, lng: 12.2472504 }}
         defaultZoom={5}
-        options={defaultProps}
+        options={{streetViewControl: false}}
         mapMinHeight="100vh"
         onGoogleApiLoaded={onGoogleApiLoaded}
       >
