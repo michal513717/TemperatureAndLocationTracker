@@ -2,6 +2,7 @@ import type { Application } from "express";
 import express from "express";
 import { CommonRoutesConfig } from "../common/common.routes.config";
 import { measurementController } from "../controllers/arduinoRouter.controllers";
+import { verifyUserMiddleware } from "../middlewares/auth.middleware";
 
 export class ArduinoRoute extends CommonRoutesConfig {
 
@@ -13,7 +14,7 @@ export class ArduinoRoute extends CommonRoutesConfig {
         
         const arduinoRouter = express.Router();
 
-        arduinoRouter.get('/measurement', measurementController);
+        arduinoRouter.post('/measurement', verifyUserMiddleware,  measurementController);
 
         this.app.use('/arduino', arduinoRouter);
 

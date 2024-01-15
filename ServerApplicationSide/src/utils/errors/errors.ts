@@ -29,3 +29,9 @@ export class UserNotFound extends ErrorWithCode {
         super("User doesnt exist", 403, "USER_NOT_EXIST");
     }
 }
+
+export class ArduinoServerError extends ErrorWithCode {
+    constructor(){
+        super("Arduino server is offline", 500, "ARDUINO_SERVER_ERROR");
+    }
+}

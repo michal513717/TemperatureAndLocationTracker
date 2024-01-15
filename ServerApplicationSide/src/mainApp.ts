@@ -6,6 +6,7 @@ import { APPLICATION_CONFIG } from "./configs";
 import { CommonRoutesConfig } from "./common/common.routes.config";
 import { BasicRoute } from "./routes/basic.routes";
 import { DatabaseRoutes } from "./routes/database.routes";
+import { ArduinoRoute } from "./routes/arduino.routes";
 import { NotValidRoutes } from "./routes/notValid.routes";
 import { AuthRoutes } from "./routes/auth.routes";
 import * as log4js from "log4js";
@@ -69,6 +70,7 @@ export class MainApp {
 
         this.routes = [] as Array<CommonRoutesConfig>;
 
+        this.routes.push(new ArduinoRoute(application));
         this.routes.push(new BasicRoute(application));
         this.routes.push(new DatabaseRoutes(application));
         this.routes.push(new AuthRoutes(application));
