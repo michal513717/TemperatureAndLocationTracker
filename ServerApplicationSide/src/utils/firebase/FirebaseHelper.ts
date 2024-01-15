@@ -12,7 +12,7 @@ export class FirebaseHelper {
     };
   };
 
-  public static getServerTimeStamp(){
-    return firebase.firestore.FieldValue.serverTimestamp();
+  public static async getServerTimeStamp() {
+    return await firebase.firestore.FieldValue.serverTimestamp();
   }
 }

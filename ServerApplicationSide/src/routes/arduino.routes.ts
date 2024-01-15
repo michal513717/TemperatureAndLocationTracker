@@ -11,10 +11,10 @@ export class ArduinoRoute extends CommonRoutesConfig {
     }
 
     configureRoute(): Application {
-        
+
         const arduinoRouter = express.Router();
 
-        arduinoRouter.post('/measurement', verifyUserMiddleware,  measurementController);
+        arduinoRouter.post('/measurement', verifyUserMiddleware, measurementController);
 
         this.app.use('/arduino', arduinoRouter);
 
