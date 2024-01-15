@@ -14,10 +14,14 @@ import {
 } from '@chakra-ui/react';
 import { Link as ReactRouterLink } from 'react-router-dom'
 import axios from "axios";
+import { useAuthStore } from '@/store/authStore';
+import { setAccessToken } from '@/store/localStorage/localStorage';
+import { APPLICATION_CONFIG } from '@/configs';
 
 function LoginScreen() {
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const { setIsAuthenticated } = useAuthStore();
     const { toggleColorMode } = useColorMode();
     const toast = useToast();
     const formBackground = useColorModeValue('gray.100', 'gray.700');
@@ -36,9 +40,13 @@ function LoginScreen() {
         }
 
         try {
-            const req = await axios.post("http://192.168.0.170:8080/auth/login", { userName, password });
+            const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + "/auth/login", { userName, password });
 
-            console.log(req.status);
+            if(req.status === 200){
+    
+                setIsAuthenticated(true);
+                setAccessToken(req.data.result.accessToken);
+            }
     
         } catch (error) {
             

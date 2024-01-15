@@ -2,6 +2,7 @@ import type { Application } from "express";
 import express from "express";
 import { CommonRoutesConfig } from "../common/common.routes.config";
 import { helloController } from "../controllers/basicRouter.controllers";
+import { verifyUserMiddleware } from "../middlewares/auth.middleware";
 
 export class BasicRoute extends CommonRoutesConfig {
 
@@ -13,7 +14,7 @@ export class BasicRoute extends CommonRoutesConfig {
         
         const basicRouter = express.Router();
 
-        basicRouter.get('/ping', helloController);
+        basicRouter.post('/ping', verifyUserMiddleware, helloController);
 
         this.app.use('/basic', basicRouter);
 

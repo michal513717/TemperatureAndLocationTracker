@@ -93,6 +93,24 @@ class DatabaseManager {
             return null;
         }
     }
+
+    public async getAllDataFromCollection(
+        collectionName: keyof Collections,
+    ) {
+        try {
+            
+            const data = await this.collections[collectionName].get();
+
+            const parsedData = data.docs.map((item) =>
+                Object.assign({ id: item.id }, item.data())
+            );
+
+            return parsedData;
+        } catch (error) {
+            logger.error(error);
+            return null;
+        }
+    }
 }
 
 var instance = new DatabaseManager();

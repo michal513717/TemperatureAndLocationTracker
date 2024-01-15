@@ -15,6 +15,8 @@ import {
 import { redirect } from "react-router-dom";
 import { Link as ReactRouterLink } from 'react-router-dom'
 import axios from "axios";
+import { useAuthStore } from '@/store/authStore';
+import { APPLICATION_CONFIG } from '@/configs';
 
 
 // TODO REFACTOR. ITS VERY BAD CODE
@@ -53,7 +55,7 @@ function LoginScreen() {
         }
 
         try {
-            const req = await axios.post("http://192.168.0.170:8080/auth/register", { userName, password });
+            const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + "/auth/register", { userName, password });
 
             console.log(req.status);
     

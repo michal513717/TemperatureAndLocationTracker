@@ -3,7 +3,7 @@ import { getLogger } from "log4js";
 
 export const debugRequest = async(application: Application) => {
 
-    const logger = getLogger();
+    const logger = getLogger("Main Router");
 
     application.use((req, res, next) => {
         logger.info(`METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);

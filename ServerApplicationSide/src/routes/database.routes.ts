@@ -1,6 +1,7 @@
-import { getAllDataController, getDataByUserController, getOnlyPositionsController } from "../controllers/databaseRouter.controllers";
+import { getAllDataController } from "../controllers/databaseRouter.controllers";
 import express, { Application } from "express";
 import { CommonRoutesConfig } from "../common/common.routes.config";
+import { verifyUserMiddleware } from "../middlewares/auth.middleware";
 
 export class DatabaseRoutes extends CommonRoutesConfig {
 
@@ -12,9 +13,9 @@ export class DatabaseRoutes extends CommonRoutesConfig {
 
     const databaseRouter = express.Router();
 
-    databaseRouter.get("/allInformation", getAllDataController);
-    databaseRouter.get("/onlyPositions", getOnlyPositionsController);
-    databaseRouter.get("/pointsByUser", getDataByUserController);
+    databaseRouter.post("/allInformation", getAllDataController);
+    // databaseRouter.get("/onlyPositions", getOnlyPositionsController);
+    // databaseRouter.get("/pointsByUser", getDataByUserController);
 
     this.app.use('/database', databaseRouter);
 
