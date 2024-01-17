@@ -35,7 +35,8 @@ function LoginScreen() {
                 status: "error",
                 duration: 3000,
                 isClosable: true,
-            })
+            });
+
             return;
         }
 
@@ -55,7 +56,6 @@ function LoginScreen() {
 
     },[userName, password]);
 
-
     return (
         <Flex h="100vh" alignItems="center" justifyContent="center">
             <Flex
@@ -68,7 +68,6 @@ function LoginScreen() {
                 <Heading mb={6}>Log In</Heading>
                 <Input
                     placeholder="johndoe@gmail.com"
-                    type="email"
                     variant="filled"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}

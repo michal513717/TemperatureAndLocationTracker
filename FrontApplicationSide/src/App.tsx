@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Box, Button } from '@chakra-ui/react';
+import { useEffect } from 'react';
+import { Box } from '@chakra-ui/react';
 import { Suspense } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { AuthRouter } from './routes/authRouter';

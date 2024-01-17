@@ -1,28 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 import GoogleMap from "google-maps-react-markers";
-import point from "@/assets/pointer.png";
 import { MarkerPoint } from "@/components/MarkerPoints";
-import { Marker } from "@/components/Marker";
 import { Button } from '@chakra-ui/react';
 import axios from 'axios';
-import { getAccessToken } from '@/store/localStorage/localStorage';
+import { getAccessToken, removeAccessToken } from '@/store/localStorage/localStorage';
 import { Point } from '@/models/points.models';
 import { APPLICATION_CONFIG } from '@/configs';
+import { useAuthStore } from '@/store/authStore';
 
 function mainScreen() {
-  const defaultProps = {
-    center: {
-      lat: 33.99835602,
-      lng: 33.01502627
-    },
-    zoom: 11
-  };
-
   const mapRef = useRef(null)
   const [mapReady, setMapReady] = useState(false)
+  const { setIsAuthenticated } = useAuthStore();
   const [points, setPoints] = useState<Point[]>([]);
 
-  const onGoogleApiLoaded = ({ map, maps }: any) => {
+  const onGoogleApiLoaded = ({ map }: any) => {
     mapRef.current = map
     setMapReady(true)
   }
@@ -51,8 +43,11 @@ function mainScreen() {
     console.log(req);
   }
 
-  const coordinates = [{lat: 50.092442, lng: 19.978649, name:"444444444444"}, {lat: 10, lng: 11, name:"4444444444444444444444444444"}]
-  console.log(points)
+  const handleLogout = async () => {
+    removeAccessToken();
+    setIsAuthenticated(false);
+  };
+
   return (
     <div style={{ height: '100vh', width: '100%', position: 'relative'}}>
       <GoogleMap
@@ -66,13 +61,14 @@ function mainScreen() {
         {
           points.map((item: Point, index) => {
             return (
-              //@ts-ignore All children which contains attribute lat i lng
-              <MarkerPoint key={index} lat={item.localization.latitude} lng={item.localization.longitude}/>
+                //@ts-ignore All children which contains attribute lat i lng
+                <MarkerPoint key={index} lat={item.localization.latitude} lng={item.localization.longitude} pointData={item}/>
               )
             })
           }
       </GoogleMap>
-      <Button pos="absolute" top="2.5" left ="200" bg="white" color="black" onClick={handleAddPoint}> Add current point </Button>
+      <Button pos="absolute" top="2.5" left="200" bg="white" color="black" onClick={handleAddPoint}> Add current point </Button>
+      <Button pos="absolute" top="2.5" left="370" bg="white" color="black" onClick={handleLogout}> Log out </Button>
 
     </div>
   )

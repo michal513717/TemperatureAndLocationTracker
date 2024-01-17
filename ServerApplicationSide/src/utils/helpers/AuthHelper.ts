@@ -4,7 +4,7 @@ import { APPLICATION_CONFIG } from '../../configs';
 import { InvalidTokenError, TokenExpiredError } from '../errors/errors';
 import { Logger, getLogger } from 'log4js';
 
-const logger = getLogger();
+const logger = getLogger("Auth Helper");
 
 export class AuthHelper {
 

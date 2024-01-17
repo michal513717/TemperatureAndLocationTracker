@@ -8,7 +8,7 @@ import { ErrorWithCode } from "../common/common.error.config";
 import { internalServerErrorResponse } from "../utils/errors/internalServerError";
 import { InvalidTokenError } from "../utils/errors/errors";
 
-const logger = log4js.getLogger();
+const logger = log4js.getLogger("Auth Middleware");
 
 export const verifyUserMiddleware = async (
     req: AuthRequest,

@@ -5,7 +5,7 @@ import { FirebaseHelper } from "../utils/firebase/FirebaseHelper";
 import initFireBaseApp from "../database/firebase";
 import { getLogger } from "log4js";
 
-const logger = getLogger();
+const logger = getLogger("Database Manager");
 
 class DatabaseManager {
 

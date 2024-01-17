@@ -12,19 +12,15 @@ import {
     useToast,
     Link as ChakraLink
 } from '@chakra-ui/react';
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import { Link as ReactRouterLink } from 'react-router-dom'
 import axios from "axios";
-import { useAuthStore } from '@/store/authStore';
 import { APPLICATION_CONFIG } from '@/configs';
-
-
-// TODO REFACTOR. ITS VERY BAD CODE
-
 
 function LoginScreen() {
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const navigate = useNavigate();
     const [repeatPassword, setRepeatPassword] = useState<string>('');
     const { toggleColorMode } = useColorMode();
     const toast = useToast();
@@ -39,7 +35,7 @@ function LoginScreen() {
                 status: "error",
                 duration: 3000,
                 isClosable: true,
-            })
+            });
             return
         }
 
@@ -50,7 +46,7 @@ function LoginScreen() {
                 status: "error",
                 duration: 3000,
                 isClosable: true,
-            })
+            });
             return;
         }
 
@@ -66,9 +62,9 @@ function LoginScreen() {
                     status: "success",
                     duration: 3000,
                     isClosable: true,
-                })
+                });
 
-                redirect("/");
+                navigate("/");
             }
 
         } catch (error: any) {
@@ -84,7 +80,7 @@ function LoginScreen() {
                 description: messeage[error?.response?.data?.code],
                 status: "error",
                 duration: 3000
-            })
+            });
         }
 
     },[userName, password, repeatPassword]);
@@ -102,7 +98,6 @@ function LoginScreen() {
                 <Heading mb={6}>Register now!</Heading>
                 <Input
                     placeholder="johndoe@gmail.com"
-                    type="email"
                     variant="filled"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}

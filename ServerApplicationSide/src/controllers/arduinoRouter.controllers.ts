@@ -25,7 +25,7 @@ export const measurementController = async (
         data.author = req.user!.userName;
 
         const record = await ArduinoManager.createObjectToSave(data);
-        console.log(record)
+
         await databaseManager.addRecord("TEMPERATURE_AND_LOCATION_COLLECTION", record);
 
         return res.status(200).json({
