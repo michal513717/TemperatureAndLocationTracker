@@ -1,17 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import GoogleMap from "google-maps-react-markers";
 import { MarkerPoint } from "@/components/MarkerPoints";
-import { Button } from '@chakra-ui/react';
+import { Button, Toast, useToast } from '@chakra-ui/react';
 import axios from 'axios';
 import { getAccessToken, removeAccessToken } from '@/store/localStorage/localStorage';
 import { Point } from '@/models/points.models';
 import { APPLICATION_CONFIG } from '@/configs';
 import { useAuthStore } from '@/store/authStore';
+import { MESSAGES } from '@/configs/messages';
+import { ROUTES } from '@/configs/routes';
 
 function mainScreen() {
   const mapRef = useRef(null)
+  const toast = useToast();
   const [mapReady, setMapReady] = useState(false)
   const { setIsAuthenticated } = useAuthStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [points, setPoints] = useState<Point[]>([]);
 
   const onGoogleApiLoaded = ({ map }: any) => {
@@ -26,22 +30,59 @@ function mainScreen() {
   }, [mapReady])
 
   const handleGetPoints = async () => {
+    try {
+     
+      const token = getAccessToken();
 
-    const token = getAccessToken();
+      const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + ROUTES.GET_POINTS, {}, { headers: { Authorization: `Barear ${token}` } });
 
-    const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + "/database/allInformation", {}, { headers: { Authorization: `Barear ${token}` } });
+      setPoints(req.data.result.data); 
 
-    setPoints(req.data.result.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleAddPoint = async () => {
 
-    const token = getAccessToken();
+    let message: string = "";
 
-    const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + "/arduino/measurement", {}, { headers: { Authorization: `Barear ${token}` } });
+    try {
+      const token = getAccessToken();
 
-    console.log(req);
+      setIsLoading(true);
+
+      const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + ROUTES.ADD_POINTS, {}, { headers: { Authorization: `Barear ${token}` } });
+
+      if(req.status !== 200){
+
+        throw Error(MESSAGES.ARDUINO_SERVER_OFFLINE);
+      }
+
+      message = MESSAGES.NEW_POINT_ADDED;
+
+      handleAddNewPoint(req.data.result.newPoint);
+    
+    } catch (error) {
+    
+      console.log(error);
+    
+      message = MESSAGES.ARDUINO_SERVER_OFFLINE;
+    } finally {
+      setIsLoading(false);
+
+      toast({
+        duration: 3000,
+        title: message,
+      })
+    }
   }
+
+  const handleAddNewPoint = useCallback((newPoint: Point) => {
+    setPoints((prevState) => [...prevState, newPoint]);
+  }, [points])
 
   const handleLogout = async () => {
     removeAccessToken();
@@ -67,7 +108,7 @@ function mainScreen() {
             })
           }
       </GoogleMap>
-      <Button pos="absolute" top="2.5" left="200" bg="white" color="black" onClick={handleAddPoint}> Add current point </Button>
+      <Button pos="absolute" top="2.5" left="200" bg="white" color="black" onClick={handleAddPoint} isLoading={isLoading}> Add current point </Button>
       <Button pos="absolute" top="2.5" left="370" bg="white" color="black" onClick={handleLogout}> Log out </Button>
 
     </div>

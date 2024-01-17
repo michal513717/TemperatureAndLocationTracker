@@ -53,6 +53,7 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    autoHideMenuBar: true,
     minHeight: 700,
     minWidth: 800
   })

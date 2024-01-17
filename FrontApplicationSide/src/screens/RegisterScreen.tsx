@@ -16,10 +16,13 @@ import { redirect, useNavigate } from "react-router-dom";
 import { Link as ReactRouterLink } from 'react-router-dom'
 import axios from "axios";
 import { APPLICATION_CONFIG } from '@/configs';
+import { MESSAGES } from '@/configs/messages';
+import { ROUTES } from '@/configs/routes';
 
 function LoginScreen() {
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const [repeatPassword, setRepeatPassword] = useState<string>('');
     const { toggleColorMode } = useColorMode();
@@ -28,63 +31,57 @@ function LoginScreen() {
 
     const handleLogin =  useCallback(async() => {
 
+        let message: string = "";
+        let title: string = "";
+        let toastType: ToastType = "error";
+
         if(password !== repeatPassword){
-            toast({
-                title: 'Invalid Data',
-                description: "Password are not equal",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
+            title = MESSAGES.INVALID_DATA;
+            message = MESSAGES.INVALID_DATA_2;
             return
         }
 
         if(userName === "" || password === ""){
-            toast({
-                title: 'Enter password and User name.',
-                description: "Please input all data",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            });
+            title = MESSAGES.INVALID_DATA_3;
+            message = MESSAGES.INVALID_DATA_4;
             return;
         }
 
         try {
-            const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + "/auth/register", { userName, password });
+            setIsLoading(true);
+
+            const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + ROUTES.REGISTER, { userName, password });
 
             console.log(req.status);
     
             if(req.status === 200){
-                toast({
-                    title: 'Success!',
-                    description: "User account create success",
-                    status: "success",
-                    duration: 3000,
-                    isClosable: true,
-                });
+                title = MESSAGES.SUCCESS_2;
+                message = MESSAGES.SUCCESS;
+                toastType = "success";
 
                 navigate("/");
             }
 
         } catch (error: any) {
             
-            let messeage = {
-                "VALIDATION_ERROR": "User name must contain min 5 chars and password 8",
-                "USER_EXIST": "User name have been already taken"
-            }
+            //@ts-ignore
+            const isServerUser = Object.keys().includes(error?.response?.data?.code);
+
+            title = isServerUser ? MESSAGES.SERVER_OFFLINE : MESSAGES.TRY_AGAIN;
+            //@ts-ignore
+            message = MESSAGES[error?.response?.data?.code]
+        } finally {
+            setIsLoading(false);
 
             toast({
-                title: "Server error.",
-                //@ts-ignore
-                description: messeage[error?.response?.data?.code],
-                status: "error",
-                duration: 3000
+                title: title,
+                description: message,
+                status: toastType,
+                duration: 3000,
+                isClosable: true,
             });
         }
-
     },[userName, password, repeatPassword]);
-
 
     return (
         <Flex h="100vh" alignItems="center" justifyContent="center">
@@ -119,7 +116,7 @@ function LoginScreen() {
                     onChange={(e) => setRepeatPassword(e.target.value)}
                     mb={6}
                 />
-                <Button colorScheme="teal" mb={8} onClick={handleLogin}>
+                <Button colorScheme="teal" mb={8} onClick={handleLogin} isLoading={isLoading}>
                     Log In
                 </Button>
                 <FormControl display="flex" alignItems="center">
@@ -144,3 +141,5 @@ function LoginScreen() {
 }
 
 export default LoginScreen;
+
+type ToastType = "success" | "error";

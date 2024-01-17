@@ -17,12 +17,14 @@ import axios from "axios";
 import { useAuthStore } from '@/store/authStore';
 import { setAccessToken } from '@/store/localStorage/localStorage';
 import { APPLICATION_CONFIG } from '@/configs';
+import { MESSAGES } from '@/configs/messages';
 
 function LoginScreen() {
     const [userName, setUserName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const { setIsAuthenticated } = useAuthStore();
     const { toggleColorMode } = useColorMode();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const toast = useToast();
     const formBackground = useColorModeValue('gray.100', 'gray.700');
 
@@ -30,8 +32,8 @@ function LoginScreen() {
 
         if(userName === "" || password === ""){
             toast({
-                title: 'Enter password and User name.',
-                description: "Please input all data",
+                title: MESSAGES.NO_DATA_ENTERED,
+                description: MESSAGES.NO_DATA_ENTERED_2,
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -41,6 +43,8 @@ function LoginScreen() {
         }
 
         try {
+            setIsLoading(true);
+
             const req = await axios.post(APPLICATION_CONFIG.SERVER_ADDRESS + "/auth/login", { userName, password });
 
             if(req.status === 200){
@@ -50,8 +54,10 @@ function LoginScreen() {
             }
     
         } catch (error) {
-            
+        
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
 
     },[userName, password]);
@@ -81,7 +87,7 @@ function LoginScreen() {
                     onChange={(e) => setPassword(e.target.value)}
                     mb={6}
                 />
-                <Button colorScheme="teal" mb={8} onClick={handleLogin}>
+                <Button colorScheme="teal" mb={8} onClick={handleLogin} isLoading={isLoading}>
                     Log In
                 </Button>
                 <FormControl display="flex" alignItems="center">

@@ -38,6 +38,7 @@ export const loginController = async (req: Request, res: Response) => {
 
 export const registerController = async (req: Request, res: Response) => {
   try {
+
     const credentials = await registerUserSchema.parseAsync(req.body);
 
     await AuthManager.addUser(credentials);
